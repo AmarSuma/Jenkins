@@ -1,0 +1,46 @@
+ pipeline {
+     agent none   // When u want to execute each stage inside different slave
+     options { 
+
+timestamps()      //Displays the time in every step
+}
+
+ 
+    stages {
+        stage('1st build') {
+            agent {                   // Agent details 
+                docker {
+                     label 'docker'
+                     customWorkspace '/tmp/workspace/workspace/suma_workspace'    //When u want to execute your job in your own path or workspace
+                    reuseNode true
+                    image 'maven:3.8.1-adoptopenjdk-11'
+                   
+                    args '-v $HOME/.m2:/root/.m2'           //Attaching volume for a container
+                }
+            }
+            steps {
+                sh ' echo something inside 1st build'
+                sh 'mvn --version'
+              
+        
+            }
+        }
+        stage('2nd Build') {
+            agent {
+                docker {
+                     label 'docker'
+                    reuseNode true
+                    image 'maven:3.8.1-adoptopenjdk-11'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+                
+            }
+            steps {
+                
+                sh ' echo something inside second build'
+                 sh 'mvn --version'
+               
+            }
+        }
+    }
+ }
