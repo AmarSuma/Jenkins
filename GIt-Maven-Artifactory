@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    environment {
+        mvn_home = '/opt/maven/bin/mvn'
+    }
+
+    stages {
+                                //Git cloning
+        stage('Cloning') {                 
+            steps {
+                git 'https://github.com/pmrubenrao/time-tracker.git'
+            }
+         }
+                              // Generating .jar or .war packages
+         stage(' buiding using maven') {
+             steps {
+                 sh "${mvn_home} -Dmaven.test.failure.ignore=true clean install" 
+             }
+         }
+                              // Deploying all .war files to "suma_build_maven-libs-release-local" repo in Jfrog Artifacory
+         stage('deploying to artifactory'){
+             steps {
+			   rtUpload (
+			      serverId: 'jfrog_cloud',    // Same name we given at the time of Artifactory configuration inside "Configure system"
+				  spec: '''{
+				     "files": [
+					 {
+					     "pattern": "*.war",
+						 "target": "suma_build_maven-libs-release-local"
+						 }
+					    ]
+					}''',
+                 ) 
+         }
+        }
+                        // If the .war package successfully deployed into Artifactory it will show the "URL" of the Jfrog for u to see the .war package inside artifactory
+		stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "jfrog_cloud"
+                )
+            }
+        }
+    }
+	}
