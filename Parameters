@@ -1,0 +1,36 @@
+pipeline{
+    agent any
+    parameters{
+         string(name: 'Test', defaultValue:'',description:'desc')
+        choice(name: 'VERSION',choices:['1.1.0','1.2.0', '1.3.0'], description:' choioces' )
+        choice(name:'DEPLOY_TO',choices:["INT","PRE","PROD"])
+        booleanParam(name:'executeTests', defaultValue:true, description:'boolean')
+        credentials(credentialType: ' username and password', defaultValue: '', , name: 'github')
+        file(description: 'upload file u want ', name: 'testfile')
+        text(description: 'Multi Line String', name: 'multiline')
+       password( description: 'Enter u\'r  PW', name: 'password')
+        //password(defaultValueAsSecret: <object of type hudson.util.Secret>, description: 'Enter u\'r  PW', name: 'password')
+    }
+    environment{
+        NEW_VERSION='1.4.0'
+        //SEVER_CREDENTIALS=credentials('pipeline-cred')
+    }
+    stages{
+        stage("Initialization"){
+            steps{
+               echo "String ---> ${Test}"
+                echo "Choice for version ---> ${VERSION}"
+               echo " choices for deploy --> ${DEPLOY_TO}"
+            }
+        }
+        stage("build"){
+           steps{
+               echo "boolean ----> ${executeTests}"  
+               echo "credentials-->${github}"
+               echo "file --> ${testfile}"
+               echo "multi line text-->${multiline}"
+               echo "PW-->${password}"
+            }
+        }
+    }
+}
