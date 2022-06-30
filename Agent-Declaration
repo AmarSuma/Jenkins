@@ -1,0 +1,38 @@
+//agent allocation for declarative form
+pipeline{
+   agent { node { label 'agent-3' } }
+   stages{
+        stage("Initialization"){
+            steps{
+               echo "String "
+            }
+       }
+      }
+      }
+
+
+
+// agent allocation for Scripted form
+node('agent-3') {
+   stage ('test') {
+       echo "workspace-->${WORKSPACE}"        //To see the default path of agent-3 -->WORKSPACE is a pre-defined variable 
+}
+}
+
+
+
+// To run in different path (not in default)
+pipeline {
+  agent {
+    node {
+         label 'slave-3'
+        customWorkspace '/tmp/linux/'   //we don't need to create path explicitly ...jenkins will create path for u
+    } }
+    stages{
+        stage ('cnhsad') {
+            steps{
+                echo 'test'
+            }
+        }
+    }
+}
