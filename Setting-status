@@ -1,0 +1,50 @@
+pipeline {
+agent any
+stages {
+    stage('Example Test') {
+        steps {
+           script {
+              
+                  // sh "exit 1" // will fail the pipeline
+                 // sh "exit 0" // would be marked as passed
+                   currentBuild.result = 'ABORTED'    //To make job Aborted or we can use "timeout" to abort a job
+                       //currentBuild.result = 'SUCCESS'   //To make job success even actual result is failure
+                       //  currentBuild.result = 'UNSTABLE'   //To make job unstable
+           }
+            // 1st way for UNSTABLE and displays the msg i.e "script failed"
+               //warnError('Script failed!') {
+               // sh 'false'
+               // }
+            // 2nd way for UNSTABLE
+               // script {
+                 // try {
+                  //sh('false')
+                //} 
+               // catch (ex) {
+                   // unstable('Script failed!')
+                 //}
+              //}
+        }
+       }
+     }
+     post {
+         success {
+             echo "success"
+         }
+         failure {
+             echo "failure"
+         }
+         always {
+             echo "always"
+         }
+         unstable {
+             echo " unstableee"
+         }
+         changed {
+             echo "unstableeeee"
+         }
+         aborted {
+             echo "aborted"
+         }
+     }
+ }
