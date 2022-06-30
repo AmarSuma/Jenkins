@@ -1,0 +1,24 @@
+pipeline {
+    environment {
+        var="ksjnxs"
+    }
+    agent any
+    stages {
+         
+        stage('Hello') {
+            steps {
+             script {       //For loop always should be inside script block
+              for (i in ["*.jar", "*.war"]) {
+                  sh "echo before assign var ${var}"
+                 println i      // printing i
+                 println var        //printing var
+                 var= i     // We can't assign i to var in this way. we have put that cmd inside sh as shown in bellow o/p=> var=   (nothing will assigned to var)
+                      println var
+                 sh 'var= ${i}'     //To assign i to var
+                   sh "echo after assign i to var ${var}"
+              }
+            }
+        }
+        }
+    }
+}
