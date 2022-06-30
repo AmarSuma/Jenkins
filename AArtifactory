@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    environment {
+        mvn_home = '/opt/maven/bin/mvn'
+    }
+
+    stages {
+        stage('Cloning') {
+            steps {
+                git 'https://github.com/pmrubenrao/time-tracker.git'
+            }
+         }
+         stage(' buiding using maven') {
+             steps {
+                 sh "${mvn_home} -Dmaven.test.failure.ignore=true clean package" 
+             }
+         }
+                    // Setting Artifactory server details here 
+	  stage('Artifactory server details'){
+        steps {
+             script {
+		 rtServer (
+            id: 'Artifactory-1',
+			url: 'Artifactory-URL',
+			username: 'Arti-UN',
+			password: 'Arti-PW',
+			timeout: 300
+            )
+		 }
+	      }
+	   }
+              //To send multiple types of files to artifactory
+         stage('deploying to artifactory'){
+            
+             steps {
+                 script {
+                     rtUpload (
+			         serverId: 'Artifactory-1',          // The one we created in previous stage
+				     spec: '''{
+				       "files": [
+				          {
+					         "pattern": "*.jar",
+					        "target": "default-maven-local"               //Sending .jar files to "default-maven-local" repo
+					        
+					     
+						   },
+						   {
+						       
+					         "pattern": "*.war",
+					        "target": "default-maven-local"             // Sending .war files to "default-maven-local" repo
+					        
+						   }
+					     ]
+					  }''',
+                      )
+                 } 
+         }
+        }
+    }
+	}
